@@ -1,0 +1,60 @@
+@background-color-hovered: #eaf1ff;
+
+h1 {
+    font-size: 2em;
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 25px;
+}
+
+.table {
+    thead {
+        th {
+            border: 0;
+        }
+
+        .sortable {
+            cursor: pointer;
+
+            &:hover {
+                background-color: @background-color-hovered;
+            }
+        }
+    }
+
+    td {
+        border: 0;
+    }
+
+    .side-control-row {
+        padding: 0;
+    }
+}
+
+.control {
+    padding-left: 15px;
+}
+
+.side-control {
+    padding: 15px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: @background-color-hovered;
+    }
+}
+
+form {
+    .invalid-message {
+        width: 100%;
+        font-size: .7em;
+        margin-top: .25rem;
+        color: red;
+
+    }
+
+    .invalid-data {
+        border: 1px solid red;
+    }
+
+}
