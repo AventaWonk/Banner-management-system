@@ -1,18 +1,15 @@
 {
-  "name": "typescript-vue-starter",
+  "name": "banner-managment-system",
   "version": "1.0.0",
   "private": true,
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --watch",
+    "build": "webpack",
+    "watch": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": {
-    "name": "Daniel Rosenwasser",
-    "url": "https://github.com/DanielRosenwasser"
-  },
   "license": "Apache-2.0",
   "dependencies": {
     "vue": "^2.5.2",
