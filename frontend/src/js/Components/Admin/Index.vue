@@ -2,8 +2,9 @@
   <div>
     <BannerForm v-if="isFormOpen" :initialData="banner" 
       :onSave="handleSave"
+      :onCancel="handleCancel"
       />
-    <button type="button" class="btn btn-outline-primary mb-2" @click="handleCreate">
+    <button type="button" class="btn btn-outline-primary mb-2 ml-4" @click="handleCreate">
       Create a new banner
     </button>
     <BannersTable :onEdit="handleEdit" :onRemove="handleRemove" :banners="banners" />
@@ -91,13 +92,13 @@ export default class Index extends Vue {
     super();
   }
 
-  handleEdit(banner: Banner) {
+  private handleEdit(banner: Banner) {
     this.isFormOpen = true;
     this.banner = banner;
     
   }
 
-  handleSave(banner: Banner) {
+  private handleSave(banner: Banner) {
     this.isFormOpen = false;
     if(banner.id) {
       this.updateBanner(banner);
@@ -107,12 +108,16 @@ export default class Index extends Vue {
     this.saveBanner(banner)
   }
 
-  handleCreate() {
+  private handleCancel(): void {
+    this.isFormOpen = false;
+  }
+
+  private handleCreate() {
     this.banner = null;
     this.isFormOpen = true;
   }
 
-  handleRemove(id) {
+  private handleRemove(id) {
     try {
       let index = this.getBannerIndexById(id);
       this.banners.splice(index, 1);
@@ -128,9 +133,9 @@ export default class Index extends Vue {
     //   });
   }
 
-  saveBanner(banner: Banner) {
+  private saveBanner(banner: Banner) {
     this.banners.push(banner);
-    // $.post("ajax/test.html", {})
+    // $.post("", {})
     //   .done(response => {
     //   })
     //   .fail( fail => {
@@ -138,7 +143,7 @@ export default class Index extends Vue {
     //   });
   }
 
-  updateBanner(banner: Banner) {
+  private updateBanner(banner: Banner) {
     try {
       let index = this.getBannerIndexById(banner.id);
       let newBannersState = [...banners];
@@ -157,7 +162,7 @@ export default class Index extends Vue {
     //   });
   }
 
-  getBannerIndexById(id): number {
+  private getBannerIndexById(id): number {
     for (let i = 0; i < this.banners.length; i++) {
       if (this.banners[i].id == id) {
         return i;

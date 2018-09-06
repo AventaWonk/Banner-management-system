@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Index from "./Components/Admin/Index.vue";
+import Index from "./Components/Superuser/Index.vue";
 import "../less/styles.less";
 
 let v = new Vue({

@@ -2,8 +2,11 @@
     <div class="">
         <div class="row">
         <div class="col-md-6">
-        <h2>{{initialData ? 'Update banner' : 'Create a new banner'}}</h2>
-            <form @submit.prevent="handleSaveButtonClick">
+        <button type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h2>{{ initialData ? 'Update banner' : 'Create a new banner' }}</h2>
+            <form @submit.prevent="handleSaveButtonClick" @change="handleChangeEvent">
                 <div class="form-group" v-if="banner.id">
                     <label for="">Id</label>
                     <input type="text" id="id" class="form-control-plaintext"
@@ -49,8 +52,10 @@
                         Please provide a valid language id.
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" :class="isValid ? '' : 'disabled'">Save</button>
-                <button type="button" class="btn btn-outline-primary">Cancel</button>
+                <button type="submit" class="btn btn-primary ml-2" :class="isValid ? '' : 'disabled'">Save</button>
+                <button type="button" class="btn btn-outline-primary float-right mr-2" 
+                    @click="handleCancelButtonClick">Cancel</button>
+                
             </form>
         </div>
     </div>
@@ -66,27 +71,51 @@ export default class BannerForm extends Vue {
 
     @Prop() initialData!: Banner;
     @Prop() onSave: (banner: Banner) => void;
+    @Prop() onCancel: Function;
 
-    private banner: Banner;
+    private banner: any;
     private isValid: boolean = false;
     private errors = {};
 
     constructor() {
         super();
         const initialBanner = {
-            id: null,
             imgSrc: '',
-            width: 0,
-            height: 0,
+            width: '',
+            height: '',
             targetUrl: '',
-            langId: 0,
+            langId: '',
         }
-        
-        this.banner = {...this.initialData ? this.initialData : initialBanner}; 
+
+        if (this.initialData) {
+            this.isValid = true;
+            this.banner = {...this.initialData};
+        } else {
+            this.banner = {...initialBanner};
+        }
     }
 
     handleSaveButtonClick(): void {
         this.onSave(this.banner);
+    }
+
+    handleChangeEvent(): void {
+        
+    }
+
+    handleCancelButtonClick(): void {
+        this.onCancel();
+    }
+
+
+    validate() {
+        for (let field in this.banner) {
+            console.log(this.banner[field])
+            if (this.banner[field] == null) {
+                this.errors[field] = true;
+            }
+        }
+        console.log(this.errors)
     }
 
 };
