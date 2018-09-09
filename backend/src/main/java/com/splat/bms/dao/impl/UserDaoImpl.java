@@ -3,43 +3,72 @@ package com.splat.bms.dao.impl;
 import com.splat.bms.dao.UserDao;
 import com.splat.bms.model.Role;
 import com.splat.bms.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public class UserDaoImpl implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    private RowMapper<User> userRowMapper;
 
     /**
      * Returns existing user model by login an password
      *
      * @param login    unique string user login
-     * @param password string user password
      * @return user model if exists
      */
     @Override
-    public User findByLoginAndPassword(String login, String password) {
-        final String SELECT_SQL = "SELECT * FORM users WHERE login = ? AND password = ?";
+    public User findByLogin(String login) {
+        final String SELECT_SQL = "SELECT * FROM app_user WHERE login = ?";
 
-        return null;
+        return  this.jdbcTemplate.queryForObject(SELECT_SQL, this.userRowMapper, login);
     }
 
     /**
      * Saves a new user into database and returns generated int id
      *
-     * @param login    unique string user login
-     * @param password string user password
-     * @param roles    List of user roles
-     * @param date     Date of creation
+
      * @return Created user id
      */
     @Override
-    public int create(String login, String password, List<Role> roles, Date date) {
-        final String INSERT_SQL = "INSERT INTO users () values (?, ?, ?)";
+    public int create(User user) {
+        final String INSERT_SQL = "INSERT INTO app_user (login, password, date) values (?, ?, ?)";
 
-        return 0;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[]{"id"});
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setTimestamp(3, new Timestamp(user.getCreationDate().getTime()));
+
+            return ps;
+        }, keyHolder);
+
+        Number insertedId = keyHolder.getKey();
+        if (insertedId == null) {
+            return 0;
+        }
+
+        return insertedId.intValue();
     }
 
+    @Autowired
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Autowired
+    public void setUserRowMapper(RowMapper<User> userRowMapper) {
+        this.userRowMapper = userRowMapper;
+    }
 }

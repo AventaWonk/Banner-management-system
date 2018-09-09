@@ -2,6 +2,7 @@ package com.splat.bms.service;
 
 import com.splat.bms.model.Role;
 import com.splat.bms.model.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
@@ -14,7 +15,10 @@ public interface UserService {
      * @param password string user password
      * @return         user model
      */
-    User getUserByLoginAndPassword(String login, String password);
+    User getUser(String login, String password);
+
+    User getUserByLogin(String login);
+
 
     /**
      * Creates a new user and encrypts password
@@ -24,6 +28,6 @@ public interface UserService {
      * @param roles    list of creating user roles
      * @return         created user id
      */
-    int addUser(String login, String password, List<Role> roles);
+    int addUser(User user);
 
 }
