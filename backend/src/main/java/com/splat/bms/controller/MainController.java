@@ -10,4 +10,9 @@ public class MainController {
     String login() {
         return "login";
     }
+
+    @GetMapping("/")
+    String index() {
+        return "index";
+    }
 }
