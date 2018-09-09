@@ -14,6 +14,18 @@ public interface RoleDao {
      */
     List<Role> findByUserId(int id);
 
-    int create(String name);
+    /**
+     * @param userId
+     * @param roleId
+     */
+    void addRoleToUser(int userId, int roleId);
+
+    /**
+     * Creates new user role
+     *
+     * @param role new user role
+     * @return     inserted row id
+     */
+    int create(Role role);
 
 }
