@@ -1,20 +1,25 @@
 <template>
-    <div class="">
-        <div class="row">
-        <div class="col-md-6">
-        <button type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        <h2>{{ initialData ? 'Update banner' : 'Create a new banner' }}</h2>
+    <div class="modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                 <h2>{{ initialBanner ? 'Update banner' : 'Create a new banner' }}</h2>
+                <button type="button" class="close" aria-label="Close" @click="handleCancelButtonClick">
+                    <span aria-hidden="true">&times;</span>
+                 </button>
+       
+            </div>
+        <div class="modal-content">
+            
+        
             <form @submit.prevent="handleSaveButtonClick" @change="handleChangeEvent">
-                <div class="form-group" v-if="banner.id">
+                <div class="form-group" v-if="initialBanner && initialBanner.id">
                     <label for="">Id</label>
                     <input type="text" id="id" class="form-control-plaintext"
-                        v-model="banner.id">
+                        v-model.lazy="formBannerData.id">
                 </div>
                 <div class="form-group">
                     <label for="">Image source</label>
-                    <input v-model="banner.imgSrc" type="text" class="form-control" id=""
+                    <input v-model.lazy="formBannerData.imgSrc" type="text" class="form-control" id=""
                         :class="errors.imgSrc ? 'invalid-data' : ''">
                     <div class="invalid-message" v-if="errors.imgSrc">
                         Please provide a valid image source.
@@ -22,7 +27,7 @@
                 </div>
                 <div class="form-group">
                     <label for="">Width</label>
-                    <input v-model="banner.width"  type="text" class="form-control" id=""
+                    <input v-model.lazy="formBannerData.width"  type="text" class="form-control" id=""
                         :class="errors.width ? 'invalid-data' : ''">
                     <div class="invalid-message" v-if="errors.width">
                         Please provide a valid width.
@@ -30,7 +35,7 @@
                 </div>
                 <div class="form-group">
                     <label for="">Height</label>
-                    <input v-model="banner.height" type="text" class="form-control" id=""
+                    <input v-model.lazy="formBannerData.height" type="text" class="form-control" id=""
                         :class="errors.height ? 'invalid-data' : ''">
                     <div class="invalid-message" v-if="errors.height">
                         Please provide a valid height.
@@ -38,7 +43,7 @@
                 </div>
                 <div class="form-group">
                     <label for="">Target URL</label>
-                    <input v-model="banner.targetUrl" type="text" class="form-control" id=""
+                    <input v-model.lazy="formBannerData.targetUrl" type="text" class="form-control" id=""
                         :class="errors.targetUrl ? 'invalid-data' : ''">
                     <div class="invalid-message" v-if="errors.targetUrl">
                         Please provide a valid URL.
@@ -46,7 +51,7 @@
                 </div>
                 <div class="form-group">
                     <label for="">Language Id</label>
-                    <input v-model="banner.langId" type="text" class="form-control" id=""
+                    <input v-model.lazy="formBannerData.langId" type="text" class="form-control" id=""
                         :class="errors.langId ? 'invalid-data' : ''">
                     <div class="invalid-message" v-if="errors.langId">
                         Please provide a valid language id.
@@ -63,59 +68,94 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator"
+import { Vue, Component, Prop } from "vue-property-decorator";
+import { validationRules } from "../../Service/ValidationRules";
 import Banner from "../../Interfaces/Banner";
+
+interface FormBannerData {
+    imgSrc: string;
+    width: string;
+    height: string;
+    targetUrl: string;
+    langId: string;
+}
 
 @Component
 export default class BannerForm extends Vue {
 
-    @Prop() initialData!: Banner;
+    @Prop() initialBanner?: Banner;
     @Prop() onSave: (banner: Banner) => void;
-    @Prop() onCancel: Function;
+    @Prop() onCancel: () => void;
 
-    private banner: any;
+    private formBannerData: FormBannerData = {
+        imgSrc: '',
+        width: '',
+        height: '',
+        targetUrl: '',
+        langId: '',
+    };
     private isValid: boolean = false;
     private errors = {};
 
     constructor() {
         super();
-        const initialBanner = {
-            imgSrc: '',
-            width: '',
-            height: '',
-            targetUrl: '',
-            langId: '',
-        }
-
-        if (this.initialData) {
-            this.isValid = true;
-            this.banner = {...this.initialData};
-        } else {
-            this.banner = {...initialBanner};
-        }
-    }
-
-    handleSaveButtonClick(): void {
-        this.onSave(this.banner);
-    }
-
-    handleChangeEvent(): void {
         
+        if (this.initialBanner) {
+            this.isValid = true;
+            this.formBannerData = {
+                imgSrc: this.initialBanner.imgSrc,
+                width: this.initialBanner.width.toString(),
+                height: this.initialBanner.height.toString(),
+                targetUrl: this.initialBanner.targetUrl,
+                langId: this.initialBanner.langId.toString(),
+            }
+        }
+        let div = document.createElement("div");
+        div.className = " modal-backdrop fade show";
+        document.body.appendChild(div)
     }
 
-    handleCancelButtonClick(): void {
+    public handleSaveButtonClick(): void {
+        let banner: Banner = {
+            id: this.initialBanner.id,
+            imgSrc: this.formBannerData.imgSrc,
+            width: parseInt(this.formBannerData.width),
+            height: parseInt(this.formBannerData.height),
+            targetUrl: this.formBannerData.targetUrl,
+            langId: parseInt(this.formBannerData.langId),
+        }
+        this.onSave(banner);
+    }
+
+    public handleChangeEvent(): void {
+        this.isValid = true;
+        this.validate();
+    }
+
+    public handleCancelButtonClick(): void {
+        document.body.removeChild(document.body.lastChild);
         this.onCancel();
     }
 
+    // private hasBannerBeenUpdated() {
+    //     for (let field in this.formBannerData) {
+    //         if (this.formBannerData[field] != this.initialBanner) {
+    //             return true;
+    //         }
+    //     }
 
-    validate() {
-        for (let field in this.banner) {
-            console.log(this.banner[field])
-            if (this.banner[field] == null) {
+    //     return false;
+    // }
+
+    private validate() {
+        this.errors = {...this.errors};
+        for (let field in this.formBannerData) {
+            if (this.formBannerData[field].match(validationRules[field])) {
+                this.errors[field] = false;
+            } else {
                 this.errors[field] = true;
             }
         }
-        console.log(this.errors)
     }
 
 };
